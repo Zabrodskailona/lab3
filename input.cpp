@@ -1,28 +1,24 @@
-#include "converter.h"
-#include <map>
-#include <stdexcept>
+#include "input.h"
+#include <iostream>
+#include <limits>
+#include <cctype>
 
-// Фіксовані курси: скільки одиниць валюти за 1 USD
-static const std::map<std::string, double> rates = {
-    {"USD", 1.00},
-    {"EUR", 0.92},
-    {"UAH", 41.50},
-    {"PLN", 3.95},
-    {"GBP", 0.79}
-};
-
-bool isSupported(const std::string& code) {
-    return rates.find(code) != rates.end();
+std::string readCurrency(const std::string& prompt) {
+    std::string code;
+    std::cout << prompt;
+    std::cin >> code;
+    for (char& c : code)
+        c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+    return code;
 }
 
-double getRate(const std::string& code) {
-    auto it = rates.find(code);
-    if (it == rates.end())
-        throw std::invalid_argument("Невідома валюта: " + code);
-    return it->second;
-}
-
-double convert(double amount, const std::string& from, const std::string& to) {
-    double inUsd = amount / getRate(from);   // спочатку в USD
-    return inUsd * getRate(to);              // потім у цільову валюту
+double readAmount() {
+    double amount;
+    std::cout << "Введіть суму: ";
+    while (!(std::cin >> amount)) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "Помилка. Введіть число: ";
+    }
+    return amount;
 }
